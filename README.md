@@ -1,60 +1,50 @@
-# Prestashop-DB-Setup-on-AWS
-Complete Setup Guide for Bitnami PrestaShop on AWS EC2 — A clear walkthrough of getting PrestaShop running using the Bitnami AMI on AWS. From launching your EC2 instance and securing your key pair, to connecting over SSH, exploring the file system, and finding your admin credentials — all in one place.
-AWS PrestaShop Setup – Full Process
+<h1 align="center" id="title">Prestashop-DB Setup on AWS</h1>
 
-# 1.Launched EC2 Instance
--Service: AWS (Amazon Web Services)
+<p id="description">This project is a complete guide to getting PrestaShop up and running on AWS EC2 using the Bitnami AMI. It walks you through every step — from launching your EC2 instance and setting up security groups to connecting over SSH grabbing your admin credentials and logging into the PrestaShop dashboard.</p>
+<img src="https://github.com/user-attachments/assets/f3196318-f6bf-403d-bb28-e4eb316bbf42" alt="Logo 1" width="250"/>  
+<img src="https://github.com/user-attachments/assets/49917104-866f-4619-a097-5ef034704450" alt="Logo 2" width="180"/>  
+<img src="https://github.com/user-attachments/assets/910cd89c-12da-460f-a37c-ff544f6c07ca" alt="Logo 3" width="500"/>  
 
--Instance Type: t3.micro (1 vCPU, 1GB RAM — free tier eligible)
 
--AMI: Amazon Machine Image for Bitnami PrestaShop 8.1.7
 
--Key Pair: Downloaded .pem file for SSH authentication.
 
--Reason: .pem file stores the private key required to securely connect via SSH.
+<img width="1530" height="728" alt="image" src="https://github.com/user-attachments/assets/c9db09fa-7813-4da6-997f-7f3d26182a3c" />
 
--Set correct permissions using:
-``
+
+<img src="https://ibb.co/Nn2mnLrM" alt="project-screenshot" width="400" height="400/"> 
+
+<h2>🛠️ Installation Steps:</h2>
+
+<p> 1. Launch EC2 Instance Open AWS Management Console → EC2 → Launch Instance Choose Bitnami PrestaShop 8.1.7 AMI Instance Type: t3.micro (Free Tier eligible) Download the .pem key pair (e.g. key-prestashop-server2.pem)</p>
+
+<p>2. Set Key File Permissions</p>
+
+```
 chmod 400 key-prestashop-server2.pem
-``
+```
 
-This ensures the key is only readable by the owner (required by SSH).
+<p>3. Configure Security Group Allow inbound rules: HTTP (80) → Access store frontend HTTPS (443) → Secure access SSH (22) → Terminal login</p>
 
-# 2.Configured Security Group
--Allowed #HTTP (80) and HTTPS (443) → For web traffic access to PrestaShop site.
+<p>4. Connect to EC2 Instance via SSH</p>
 
--Allowed SSH (22) → For secure terminal access.
-
--SSH Connection to Instance
-Connected using:
+```
 ssh -i key-prestashop-server2.pem bitnami@<public-ip>
+```
 
--Initially got a “UNPROTECTED PRIVATE KEY FILE” error because the .pem file had open permissions (0555).
+<p>5. If you see UNPROTECTED PRIVATE KEY FILE! → Move the .pem into WSL/Linux home folder and reapply permissions:</p>
 
-Fixed by cloning .pem inside WSL’s Linux filesystem and setting chmod 400.
+```
+cp /mnt/c/Users//Downloads/key-prestashop-server2.pem ~/ chmod 400 ~/key-prestashop-server2.pem ssh -i ~/key-prestashop-server2.pem bitnami@
+```
 
-Reason: Files stored on /mnt/c or /mnt/d (Windows drives) don’t properly apply Linux permissions, so SSH rejects them. Cloning moves them to WSL’s native filesystem, where permissions are enforced correctly.
+<p>6. Locate PrestaShop Credentials</p>
 
-Accessed Bitnami PrestaShop Environment
+```
+cat ~/bitnami_credentials
+```
 
-After SSH login, listed files:
+<p>7. Access PrestaShop in Browser:-Admin Dashboard:</p>
 
-``bitnami_credentials  htdocs  stack``
-
-
-Viewed bitnami_credentials file to get default admin username & password (hidden here for security).
-
-These credentials allow logging into:
-
-PrestaShop admin panel (web browser)
-
-<img width="1919" height="913" alt="image" src="https://github.com/user-attachments/assets/2c1f52f2-cdb0-40d7-98f9-1659cdd02298" />
-
-
-MySQL database (included in Bitnami stack)
-
-Logged Into PrestaShop Admin Dashboard
-
-Used public IP + /admin path in browser.
-
-Entered provided credentials to access the PrestaShop dashboard.
+```
+http://<public-ip>/admin
+```
